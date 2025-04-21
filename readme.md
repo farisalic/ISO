@@ -29,35 +29,6 @@ Za pokretanje aplikacije potrebno je:
 
 ---
 
-## Uputstva za pokretanje
-
-### Priprema aplikacije:
-```bash
-./pripremi_aplikaciju.sh
-```
-- Kreira potrebne slike, volume i mrežu
-
-### Pokretanje aplikacije:
-```bash
-./pokreni_aplikaciju.sh
-```
-- Pokreće sve servise
-- Ispisuje poruku za pristup aplikaciji
-
-### Pauziranje aplikacije:
-```bash
-./zaustavi_aplikaciju.sh
-```
-- Pauzira kontejnere bez gubitka podataka
-
-### Brisanje aplikacije:
-```bash
-./obrisi_aplikaciju.sh
-```
-- Zaustavlja i briše kontejnere, slike, volume i mrežu
-
----
-
 ## Primjer korištenja:
 
 ```bash 
@@ -66,7 +37,7 @@ Za pokretanje aplikacije potrebno je:
 ```bash 
 ./pokreni_aplikaciju.sh 
 ```
-# Aplikacija dostupna na http://localhost:8080
+Aplikacija dostupna na http://localhost:8080
 ```bash 
 ./zaustavi_aplikaciju.sh 
 ```
