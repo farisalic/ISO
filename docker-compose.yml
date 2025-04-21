@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: nginx:latest
+    container_name: notes-frontend
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - notes-net
+
+  backend:
+    build: ./backend
+    container_name: notes-backend
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: flask run --host=0.0.0.0 --port=5000 --reload
+    environment:
+      - FLASK_ENV=development
+      - DB_HOST=db
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - notes-net
+
+  db:
+    image: postgres:13
+    container_name: notes-db
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - notes-db-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - notes-net
+
+networks:
+  notes-net:
+
+volumes:
+  notes-db-data:
