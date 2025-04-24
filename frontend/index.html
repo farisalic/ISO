@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimpleNotes</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 1rem; }
+    input, button { padding: 0.5rem; margin: 0.5rem 0; width: 100%; }
+    .note { border: 1px solid #ccc; padding: 0.5rem; margin-top: 0.5rem; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>ISONotes</h1>
+  <input id="noteInput" type="text" placeholder="Enter your note..." />
+  <button onclick="addNote()">Add Note</button>
+  <div id="notes"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
