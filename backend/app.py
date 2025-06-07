@@ -19,6 +19,24 @@ def get_connection():
         password=DB_PASS
     )
 
+# Health check endpoints
+@app.route("/", methods=["GET"])
+def root():
+    return jsonify({"status": "healthy", "service": "notes-api"}), 200
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    try:
+        # Test database connection
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT 1")
+        cur.close()
+        conn.close()
+        return jsonify({"status": "healthy", "database": "connected"}), 200
+    except Exception as e:
+        return jsonify({"status": "unhealthy", "error": str(e)}), 500
+
 @app.route("/notes", methods=["GET"])
 def get_notes():
     conn = get_connection()
