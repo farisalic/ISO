@@ -1,15 +1,28 @@
 variable "aws_region" {
-  default = "us-east-1"
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "instance_type" {
-  default = "t3.micro"
+  description = "EC2 instance type"
+  type        = string
+  default     = "t3.micro"
 }
 
 variable "key_name" {
-  description = "SSH key for EC2"
+  description = "SSH key pair name for EC2 access"
+  type        = string
 }
 
 variable "project_name" {
-  default = "notes-app"
+  description = "Project name for resource naming"
+  type        = string
+  default     = "notes-app"
+}
+
+variable "git_repo_url" {
+  description = "Git repository URL to clone"
+  type        = string
+  default     = "https://github.com/farisalic/ISO.git"
 }

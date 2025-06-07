@@ -1,10 +1,17 @@
 resource "aws_security_group" "alb_sg" {
-  name   = "alb_sg"
-  vpc_id = aws_vpc.main.id
+  name_prefix = "alb-sg-"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -15,33 +22,73 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "${var.project_name}-alb-sg"
+  }
 }
 
 resource "aws_lb" "app_lb" {
-  name               = "notes-alb"
+  name               = "${var.project_name}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = [aws_subnet.public.id]
+  subnets            = [aws_subnet.public_1.id, aws_subnet.public_2.id]
   security_groups    = [aws_security_group.alb_sg.id]
+
+  tags = {
+    Name = "${var.project_name}-alb"
+  }
 }
 
 resource "aws_lb_target_group" "frontend_tg" {
-  name     = "frontend-tg"
+  name     = "${var.project_name}-frontend-tg"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name = "${var.project_name}-frontend-tg"
+  }
 }
 
 resource "aws_lb_target_group" "backend_tg" {
-  name     = "backend-tg"
+  name     = "${var.project_name}-backend-tg"
   port     = 5000
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200,404"  # Dozvoliti 404 dok ne napravite health endpoint
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name = "${var.project_name}-backend-tg"
+  }
 }
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.app_lb.arn
-  port              = 80
+  port              = "80"
   protocol          = "HTTP"
 
   default_action {
@@ -52,18 +99,17 @@ resource "aws_lb_listener" "http" {
 
 resource "aws_lb_listener_rule" "backend_rule" {
   listener_arn = aws_lb_listener.http.arn
-
-  conditions {
-    path_pattern {
-      values = ["/api/*"]
-    }
-  }
-
-  priority = 10
+  priority     = 100
 
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.backend_tg.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/*"]
+    }
   }
 }
 
