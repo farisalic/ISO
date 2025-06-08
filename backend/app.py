@@ -27,7 +27,6 @@ def root():
 @app.route("/api/health", methods=["GET"])
 def health():
     try:
-        # Test database connection
         conn = get_connection()
         cur = conn.cursor()
         cur.execute("SELECT 1")
@@ -37,6 +36,7 @@ def health():
     except Exception as e:
         return jsonify({"status": "unhealthy", "error": str(e)}), 500
 
+# Original routes (za nginx proxy)
 @app.route("/notes", methods=["GET"])
 def get_notes():
     conn = get_connection()
@@ -58,6 +58,15 @@ def add_note():
     cur.close()
     conn.close()
     return jsonify({"message": "Note added"}), 201
+
+# API routes (za direktan ALB pristup)
+@app.route("/api/notes", methods=["GET"])
+def api_get_notes():
+    return get_notes()
+
+@app.route("/api/notes", methods=["POST"])
+def api_add_note():
+    return add_note()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
