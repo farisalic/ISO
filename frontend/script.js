@@ -1,4 +1,4 @@
-const apiUrl = "http://localhost:5000/notes";
+const apiUrl = "/api/notes";
 
 async function fetchNotes() {
   const res = await fetch(apiUrl);
