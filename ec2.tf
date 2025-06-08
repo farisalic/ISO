@@ -7,10 +7,9 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Ograničite na vaš IP za bezbednost
+    cidr_blocks = ["0.0.0.0/0"] 
   }
 
-  # Frontend port - dozvoliti samo sa ALB-a
   ingress {
     from_port       = 8080
     to_port         = 8080
@@ -25,7 +24,6 @@ resource "aws_security_group" "ec2_sg" {
   security_groups = [aws_security_group.alb_sg.id]
 }
 
-  # Backend port - dozvoliti samo sa ALB-a
   ingress {
     from_port       = 5000
     to_port         = 5000
@@ -33,7 +31,6 @@ resource "aws_security_group" "ec2_sg" {
     security_groups = [aws_security_group.alb_sg.id]
   }
 
-  # PostgreSQL port - samo lokalno
   ingress {
     from_port   = 5432
     to_port     = 5432
@@ -55,7 +52,7 @@ resource "aws_security_group" "ec2_sg" {
 
 resource "aws_ebs_volume" "db_data" {
   availability_zone = "us-east-1a"
-  size              = 20  # Povećano sa 10GB
+  size              = 20 
   type              = "gp3"
   encrypted         = true
 
@@ -65,7 +62,7 @@ resource "aws_ebs_volume" "db_data" {
 }
 
 resource "aws_instance" "app" {
-  ami                         = "ami-0c02fb55956c7d316"  # Amazon Linux 2 AMI
+  ami                         = "ami-0c02fb55956c7d316" 
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.public_1.id
   vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
@@ -90,7 +87,7 @@ resource "aws_instance" "app" {
 }
 
 resource "aws_volume_attachment" "db_attach" {
-  device_name = "/dev/xvdf"  # Promenjeno sa /dev/sdf
+  device_name = "/dev/xvdf"
   volume_id   = aws_ebs_volume.db_data.id
   instance_id = aws_instance.app.id
 }
